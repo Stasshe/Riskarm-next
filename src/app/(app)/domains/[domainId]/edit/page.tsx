@@ -10,13 +10,6 @@ import { notifyDiscord } from "@/lib/discordNotify";
 import { getDomain, updateDomain } from "@/lib/firestore/domains";
 import type { DomainInput } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "ドメインの保存に失敗しました。";
-}
-
 export default function DomainEditPage() {
   const params = useParams<{ domainId: string }>();
   const router = useRouter();
@@ -50,7 +43,11 @@ export default function DomainEditPage() {
         });
       } catch (loadError) {
         if (active) {
-          setError(getErrorMessage(loadError));
+          let message = "ドメイン情報の取得に失敗しました。";
+          if (loadError instanceof Error) {
+            message = loadError.message;
+          }
+          setError(message);
         }
       } finally {
         if (active) {
@@ -73,7 +70,11 @@ export default function DomainEditPage() {
       void notifyDiscord(`ドメインを更新しました: ${input.name}`);
       router.push(`/domains/${domainId}`);
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      let message = "ドメインの保存に失敗しました。";
+      if (submitError instanceof Error) {
+        message = submitError.message;
+      }
+      setError(message);
       throw submitError;
     }
   };

@@ -17,13 +17,6 @@ import {
 import { listTemplates } from "@/lib/firestore/templates";
 import type { FindingTemplate } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "テンプレート一覧の取得に失敗しました。";
-}
-
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<FindingTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +35,11 @@ export default function TemplatesPage() {
         }
       } catch (loadError) {
         if (active) {
-          setError(getErrorMessage(loadError));
+          let message = "テンプレート一覧の取得に失敗しました。";
+          if (loadError instanceof Error) {
+            message = loadError.message;
+          }
+          setError(message);
         }
       } finally {
         if (active) {

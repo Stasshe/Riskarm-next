@@ -9,13 +9,6 @@ import { notifyDiscord } from "@/lib/discordNotify";
 import { createTemplate } from "@/lib/firestore/templates";
 import type { FindingTemplateInput } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "テンプレートの追加に失敗しました。";
-}
-
 export default function TemplateAddPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +20,11 @@ export default function TemplateAddPage() {
       void notifyDiscord(`テンプレートを追加しました: ${input.title}`);
       router.push(`/templates/${templateId}`);
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      let message = "テンプレートの追加に失敗しました。";
+      if (submitError instanceof Error) {
+        message = submitError.message;
+      }
+      setError(message);
       throw submitError;
     }
   };

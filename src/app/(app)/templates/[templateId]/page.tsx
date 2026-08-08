@@ -13,13 +13,6 @@ import { notifyDiscord } from "@/lib/discordNotify";
 import { deleteTemplate, getTemplate } from "@/lib/firestore/templates";
 import type { FindingTemplate } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "テンプレート情報の取得に失敗しました。";
-}
-
 export default function TemplateDetailPage() {
   const params = useParams<{ templateId: string }>();
   const router = useRouter();
@@ -43,7 +36,11 @@ export default function TemplateDetailPage() {
         }
       } catch (loadError) {
         if (active) {
-          setError(getErrorMessage(loadError));
+          let message = "テンプレート情報の取得に失敗しました。";
+          if (loadError instanceof Error) {
+            message = loadError.message;
+          }
+          setError(message);
         }
       } finally {
         if (active) {
@@ -75,7 +72,11 @@ export default function TemplateDetailPage() {
       void notifyDiscord(`テンプレートを削除しました: ${template.title}`);
       router.push("/templates");
     } catch (deleteError) {
-      setError(getErrorMessage(deleteError));
+      let message = "テンプレートの削除に失敗しました。";
+      if (deleteError instanceof Error) {
+        message = deleteError.message;
+      }
+      setError(message);
     } finally {
       setDeleting(false);
     }
@@ -126,7 +127,10 @@ export default function TemplateDetailPage() {
       <section className="rounded-lg border border-dark-border bg-dark-card p-6 shadow-md">
         <dl className="grid gap-4 text-sm md:grid-cols-[12rem_1fr]">
           <dt className="font-semibold text-light-text">未検出用</dt>
-          <dd className="text-medium-text">{template.notFound ? "はい" : "いいえ"}</dd>
+          <dd className="text-medium-text">
+            {template.notFound && "はい"}
+            {!template.notFound && "いいえ"}
+          </dd>
           <dt className="font-semibold text-light-text">危険度</dt>
           <dd className="font-bold text-accent-color">{template.riskLevel}</dd>
           <dt className="font-semibold text-light-text">被害度</dt>

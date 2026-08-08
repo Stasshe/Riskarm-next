@@ -28,13 +28,6 @@ const STATUS_LABELS: Record<FindingStatus, string> = {
   REVIEWED: "レビュー済み",
 };
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "ドメイン情報の取得に失敗しました。";
-}
-
 function formatDate(value: string | null): string {
   if (!value) {
     return "-";
@@ -81,7 +74,11 @@ export default function DomainDetailPage() {
         }
       } catch (loadError) {
         if (active) {
-          setError(getErrorMessage(loadError));
+          let message = "ドメイン情報の取得に失敗しました。";
+          if (loadError instanceof Error) {
+            message = loadError.message;
+          }
+          setError(message);
         }
       } finally {
         if (active) {
@@ -115,7 +112,11 @@ export default function DomainDetailPage() {
       void notifyDiscord(`ドメインを削除しました: ${domain.name}`);
       router.push("/domains");
     } catch (deleteError) {
-      setError(getErrorMessage(deleteError));
+      let message = "ドメインの削除に失敗しました。";
+      if (deleteError instanceof Error) {
+        message = deleteError.message;
+      }
+      setError(message);
     } finally {
       setDeleting(false);
     }

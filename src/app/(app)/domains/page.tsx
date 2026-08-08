@@ -17,13 +17,6 @@ import {
 import { listDomains } from "@/lib/firestore/domains";
 import type { Domain } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "ドメイン一覧の取得に失敗しました。";
-}
-
 export default function DomainsPage() {
   const [domains, setDomains] = useState<Domain[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +35,11 @@ export default function DomainsPage() {
         }
       } catch (loadError) {
         if (active) {
-          setError(getErrorMessage(loadError));
+          let message = "ドメイン一覧の取得に失敗しました。";
+          if (loadError instanceof Error) {
+            message = loadError.message;
+          }
+          setError(message);
         }
       } finally {
         if (active) {

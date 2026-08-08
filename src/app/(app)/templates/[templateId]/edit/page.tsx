@@ -10,13 +10,6 @@ import { notifyDiscord } from "@/lib/discordNotify";
 import { getTemplate, updateTemplate } from "@/lib/firestore/templates";
 import type { FindingTemplateInput } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "テンプレートの保存に失敗しました。";
-}
-
 export default function TemplateEditPage() {
   const params = useParams<{ templateId: string }>();
   const router = useRouter();
@@ -57,7 +50,11 @@ export default function TemplateEditPage() {
         });
       } catch (loadError) {
         if (active) {
-          setError(getErrorMessage(loadError));
+          let message = "テンプレート情報の取得に失敗しました。";
+          if (loadError instanceof Error) {
+            message = loadError.message;
+          }
+          setError(message);
         }
       } finally {
         if (active) {
@@ -80,7 +77,11 @@ export default function TemplateEditPage() {
       void notifyDiscord(`テンプレートを更新しました: ${input.title}`);
       router.push(`/templates/${templateId}`);
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      let message = "テンプレートの保存に失敗しました。";
+      if (submitError instanceof Error) {
+        message = submitError.message;
+      }
+      setError(message);
       throw submitError;
     }
   };

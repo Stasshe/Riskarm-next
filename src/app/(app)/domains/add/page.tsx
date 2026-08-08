@@ -9,13 +9,6 @@ import { notifyDiscord } from "@/lib/discordNotify";
 import { createDomain } from "@/lib/firestore/domains";
 import type { DomainInput } from "@/types";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "ドメインの追加に失敗しました。";
-}
-
 export default function DomainAddPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +20,11 @@ export default function DomainAddPage() {
       void notifyDiscord(`ドメインを追加しました: ${input.name}`);
       router.push(`/domains/${domainId}`);
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      let message = "ドメインの追加に失敗しました。";
+      if (submitError instanceof Error) {
+        message = submitError.message;
+      }
+      setError(message);
       throw submitError;
     }
   };

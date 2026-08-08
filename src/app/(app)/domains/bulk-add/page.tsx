@@ -10,13 +10,6 @@ import { parseCsvToDomainInputs } from "@/lib/csv";
 import { notifyDiscord } from "@/lib/discordNotify";
 import { bulkAddDomains } from "@/lib/firestore/domains";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return "ドメインの一括登録に失敗しました。";
-}
-
 export default function DomainBulkAddPage() {
   const router = useRouter();
   const [csvText, setCsvText] = useState("");
@@ -40,7 +33,11 @@ export default function DomainBulkAddPage() {
       void notifyDiscord(`ドメインを一括登録しました: ${count}件`);
       window.setTimeout(() => router.push("/domains"), 800);
     } catch (submitError) {
-      setError(getErrorMessage(submitError));
+      let message = "ドメインの一括登録に失敗しました。";
+      if (submitError instanceof Error) {
+        message = submitError.message;
+      }
+      setError(message);
     } finally {
       setSubmitting(false);
     }
