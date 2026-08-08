@@ -13,6 +13,14 @@ interface DomainFormProps {
   submitLabel: string;
 }
 
+function createRowId(prefix: string): string {
+  return `${prefix}-${globalThis.crypto.randomUUID()}`;
+}
+
+function createRowIds(values: readonly string[], prefix: string): string[] {
+  return values.map(() => createRowId(prefix));
+}
+
 function currentDateString(): string {
   const now = new Date();
   const year = now.getFullYear();
@@ -51,11 +59,18 @@ export default function DomainForm({ initialValue, onSubmit, submitLabel }: Doma
     }
     return createDefaultInput();
   });
+  const [surveyItemIds, setSurveyItemIds] = useState<string[]>(() => {
+    if (initialValue) {
+      return createRowIds(initialValue.surveyItems, "survey-item");
+    }
+    return createRowIds(createDefaultInput().surveyItems, "survey-item");
+  });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialValue) {
       setFormData(initialValue);
+      setSurveyItemIds(createRowIds(initialValue.surveyItems, "survey-item"));
     }
   }, [initialValue]);
 
@@ -81,6 +96,7 @@ export default function DomainForm({ initialValue, onSubmit, submitLabel }: Doma
 
   const addSurveyItem = () => {
     setFormData((current) => ({ ...current, surveyItems: [...current.surveyItems, ""] }));
+    setSurveyItemIds((current) => [...current, createRowId("survey-item")]);
   };
 
   const removeSurveyItem = (index: number) => {
@@ -90,6 +106,13 @@ export default function DomainForm({ initialValue, onSubmit, submitLabel }: Doma
         return { ...current, surveyItems: [""] };
       }
       return { ...current, surveyItems: nextItems };
+    });
+    setSurveyItemIds((current) => {
+      const nextIds = current.filter((_, itemIndex) => itemIndex !== index);
+      if (nextIds.length === 0) {
+        return [createRowId("survey-item")];
+      }
+      return nextIds;
     });
   };
 
@@ -172,10 +195,10 @@ export default function DomainForm({ initialValue, onSubmit, submitLabel }: Doma
       </div>
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-medium text-light-text">検査実施項目</label>
+        <div className="mb-2 text-sm font-medium text-light-text">検査実施項目</div>
         <div className="space-y-2">
           {formData.surveyItems.map((item, index) => (
-            <div className="flex items-start gap-2" key={`survey-item-${index}`}>
+            <div className="flex items-start gap-2" key={surveyItemIds[index]}>
               <Input
                 type="text"
                 name={`surveyItems.${index}`}

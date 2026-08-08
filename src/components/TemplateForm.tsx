@@ -22,6 +22,14 @@ interface TemplateFormProps {
   submitLabel: string;
 }
 
+function createRowId(prefix: string): string {
+  return `${prefix}-${globalThis.crypto.randomUUID()}`;
+}
+
+function createRowIds(values: readonly (FindingLocation | string)[], prefix: string): string[] {
+  return values.map(() => createRowId(prefix));
+}
+
 const HTTP_METHODS = [
   "GET",
   "POST",
@@ -67,11 +75,32 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
     }
     return createDefaultInput();
   });
+  const [locationIds, setLocationIds] = useState<string[]>(() => {
+    if (initialValue) {
+      return createRowIds(initialValue.locations, "location");
+    }
+    return createRowIds(createDefaultInput().locations, "location");
+  });
+  const [stepIds, setStepIds] = useState<string[]>(() => {
+    if (initialValue) {
+      return createRowIds(initialValue.reproductionSteps, "step");
+    }
+    return createRowIds(createDefaultInput().reproductionSteps, "step");
+  });
+  const [referenceIds, setReferenceIds] = useState<string[]>(() => {
+    if (initialValue) {
+      return createRowIds(initialValue.references, "reference");
+    }
+    return createRowIds(createDefaultInput().references, "reference");
+  });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialValue) {
       setFormData(initialValue);
+      setLocationIds(createRowIds(initialValue.locations, "location"));
+      setStepIds(createRowIds(initialValue.reproductionSteps, "step"));
+      setReferenceIds(createRowIds(initialValue.references, "reference"));
     }
   }, [initialValue]);
 
@@ -125,6 +154,7 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       ...current,
       locations: [...current.locations, { method: "GET", url: "", parameter: "" }],
     }));
+    setLocationIds((current) => [...current, createRowId("location")]);
   };
 
   const removeLocation = (index: number) => {
@@ -134,6 +164,13 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
         return { ...current, locations: [{ method: "GET", url: "", parameter: "" }] };
       }
       return { ...current, locations: nextLocations };
+    });
+    setLocationIds((current) => {
+      const nextIds = current.filter((_, locationIndex) => locationIndex !== index);
+      if (nextIds.length === 0) {
+        return [createRowId("location")];
+      }
+      return nextIds;
     });
   };
 
@@ -163,6 +200,27 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       }
       return { ...current, [field]: nextItems };
     });
+    if (field === "reproductionSteps") {
+      setStepIds((current) => {
+        const nextIds = [...current];
+        if (index === undefined) {
+          nextIds.push(createRowId("step"));
+        } else {
+          nextIds.splice(index + 1, 0, createRowId("step"));
+        }
+        return nextIds;
+      });
+      return;
+    }
+    setReferenceIds((current) => {
+      const nextIds = [...current];
+      if (index === undefined) {
+        nextIds.push(createRowId("reference"));
+      } else {
+        nextIds.splice(index + 1, 0, createRowId("reference"));
+      }
+      return nextIds;
+    });
   };
 
   const removeStringArrayRow = (field: "reproductionSteps" | "references", index: number) => {
@@ -173,15 +231,32 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       }
       return { ...current, [field]: nextItems };
     });
+    if (field === "reproductionSteps") {
+      setStepIds((current) => {
+        const nextIds = current.filter((_, itemIndex) => itemIndex !== index);
+        if (nextIds.length === 0) {
+          return [createRowId("step")];
+        }
+        return nextIds;
+      });
+      return;
+    }
+    setReferenceIds((current) => {
+      const nextIds = current.filter((_, itemIndex) => itemIndex !== index);
+      if (nextIds.length === 0) {
+        return [createRowId("reference")];
+      }
+      return nextIds;
+    });
   };
 
   const moveStep = (index: number, direction: "up" | "down") => {
-    setFormData((current) => {
-      let targetIndex = index - 1;
-      if (direction === "down") {
-        targetIndex = index + 1;
-      }
+    let targetIndex = index - 1;
+    if (direction === "down") {
+      targetIndex = index + 1;
+    }
 
+    setFormData((current) => {
       const currentStep = current.reproductionSteps[index];
       const targetStep = current.reproductionSteps[targetIndex];
       if (currentStep === undefined || targetStep === undefined) {
@@ -192,6 +267,17 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       nextSteps[index] = targetStep;
       nextSteps[targetIndex] = currentStep;
       return { ...current, reproductionSteps: nextSteps };
+    });
+    setStepIds((current) => {
+      const currentId = current[index];
+      const targetId = current[targetIndex];
+      if (currentId === undefined || targetId === undefined) {
+        return current;
+      }
+      const nextIds = [...current];
+      nextIds[index] = targetId;
+      nextIds[targetIndex] = currentId;
+      return nextIds;
     });
   };
 
@@ -274,10 +360,10 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       />
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-medium text-light-text">発生個所</label>
+        <div className="mb-2 text-sm font-medium text-light-text">発生個所</div>
         <div className="space-y-2">
           {formData.locations.map((location, index) => (
-            <div className="grid gap-2 md:grid-cols-[8rem_1fr_1fr_auto]" key={`location-${index}`}>
+            <div className="grid gap-2 md:grid-cols-[8rem_1fr_1fr_auto]" key={locationIds[index]}>
               <Select
                 name={`locationMethod.${index}`}
                 options={HTTP_METHODS.map((method) => ({ value: method, label: method }))}
@@ -341,10 +427,10 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       />
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-medium text-light-text">再現手順</label>
+        <div className="mb-2 text-sm font-medium text-light-text">再現手順</div>
         <div className="space-y-2">
           {formData.reproductionSteps.map((step, index) => (
-            <div className="grid gap-2 md:grid-cols-[auto_1fr_auto_auto]" key={`step-${index}`}>
+            <div className="grid gap-2 md:grid-cols-[auto_1fr_auto_auto]" key={stepIds[index]}>
               <div className="flex gap-1">
                 <Button
                   type="button"
@@ -431,10 +517,10 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
       />
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-medium text-light-text">参考文献</label>
+        <div className="mb-2 text-sm font-medium text-light-text">参考文献</div>
         <div className="space-y-2">
           {formData.references.map((reference, index) => (
-            <div className="flex items-start gap-2" key={`reference-${index}`}>
+            <div className="flex items-start gap-2" key={referenceIds[index]}>
               <TextArea
                 name={`references.${index}`}
                 placeholder="参考文献"

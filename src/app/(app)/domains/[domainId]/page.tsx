@@ -190,8 +190,8 @@ export default function DomainDetailPage() {
           <dt className="font-semibold text-light-text">検査実施項目</dt>
           <dd>
             <ul className="list-disc space-y-1 pl-5 text-medium-text">
-              {domain.surveyItems.map((item, index) => (
-                <li key={`survey-item-${index}`}>{item}</li>
+              {domain.surveyItems.map((item) => (
+                <li key={item}>{item}</li>
               ))}
             </ul>
           </dd>

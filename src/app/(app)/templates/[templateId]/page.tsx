@@ -144,8 +144,8 @@ export default function TemplateDetailPage() {
           <dt className="font-semibold text-light-text">発生個所</dt>
           <dd>
             <ul className="list-disc space-y-1 pl-5 text-medium-text">
-              {template.locations.map((location, index) => (
-                <li key={`location-${index}`}>
+              {template.locations.map((location) => (
+                <li key={`${location.method}-${location.url}-${location.parameter}`}>
                   {location.method} {location.url} {location.parameter}
                 </li>
               ))}
@@ -158,8 +158,8 @@ export default function TemplateDetailPage() {
           <dt className="font-semibold text-light-text">再現手順</dt>
           <dd>
             <ol className="list-decimal space-y-1 pl-5 text-medium-text">
-              {template.reproductionSteps.map((step, index) => (
-                <li className="whitespace-pre-wrap" key={`step-${index}`}>
+              {template.reproductionSteps.map((step) => (
+                <li className="whitespace-pre-wrap" key={step}>
                   {step}
                 </li>
               ))}
@@ -176,8 +176,8 @@ export default function TemplateDetailPage() {
           <dt className="font-semibold text-light-text">参考文献</dt>
           <dd>
             <ol className="list-decimal space-y-1 pl-5 text-medium-text">
-              {template.references.map((reference, index) => (
-                <li className="whitespace-pre-wrap" key={`reference-${index}`}>
+              {template.references.map((reference) => (
+                <li className="whitespace-pre-wrap" key={reference}>
                   {reference}
                 </li>
               ))}
