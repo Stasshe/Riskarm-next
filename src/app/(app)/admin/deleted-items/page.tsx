@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { Timestamp } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
 
 import Button from "@/components/Button";
 import ErrorMessage from "@/components/ErrorMessage";
@@ -32,7 +32,7 @@ export default function AdminDeletedItemsPage() {
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadDeletedItems = async () => {
+  const loadDeletedItems = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -49,7 +49,7 @@ export default function AdminDeletedItemsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -59,7 +59,7 @@ export default function AdminDeletedItemsPage() {
     }
 
     void loadDeletedItems();
-  }, [authLoading, isAdmin]);
+  }, [authLoading, isAdmin, loadDeletedItems]);
 
   const handleRestoreDomain = async (domainId: string) => {
     setRestoringId(domainId);

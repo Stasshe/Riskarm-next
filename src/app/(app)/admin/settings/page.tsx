@@ -98,12 +98,12 @@ export default function AdminSettingsPage() {
           label="共有されるレポートタイトル"
           type="text"
           value={form.reportTitle}
-          onChange={(event) => setForm((current) => ({ ...current, reportTitle: event.target.value }))}
+          onChange={(event) =>
+            setForm((current) => ({ ...current, reportTitle: event.target.value }))
+          }
           required
         />
-        <p className="mb-4 mt-1 text-sm text-medium-text">
-          例: 脆弱性診断結果_{"{{domain.name}}"}
-        </p>
+        <p className="mb-4 mt-1 text-sm text-medium-text">例: 脆弱性診断結果_{"{{domain.name}}"}</p>
         <Input
           label="未検出の脆弱性のタイトルにつける文字"
           type="text"

@@ -76,7 +76,9 @@ export default function FindingReportPage() {
   }
 
   if (!finding) {
-    return <div className="flex h-screen items-center justify-center">指摘事項が見つかりません。</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">指摘事項が見つかりません。</div>
+    );
   }
 
   return (
@@ -96,6 +98,7 @@ export default function FindingReportPage() {
         <thead>
           <tr>
             <td>
+              {/* biome-ignore lint/performance/noImgElement: print CSS targets the original report header image markup. */}
               <img className="header-icon" alt="" src="/images/header.svg" />
             </td>
           </tr>

@@ -88,6 +88,34 @@ function getLocationTitle(finding: Finding): string {
   return "発生箇所";
 }
 
+function getDimmedClass(
+  feasibility: Feasibility,
+  severity: Severity,
+  currentFeasibility: Feasibility,
+  currentSeverity: Severity,
+): string {
+  if (isDimmed(feasibility, severity, currentFeasibility, currentSeverity)) return " dimmed";
+  return "";
+}
+
+function MarkdownHtml({
+  finding,
+  id,
+  markdownSource,
+}: {
+  finding: Finding;
+  id: string;
+  markdownSource: string;
+}) {
+  return (
+    <div
+      id={id}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: renderMarkdown is the shared report renderer.
+      dangerouslySetInnerHTML={renderFindingMarkdown(finding, markdownSource)}
+    />
+  );
+}
+
 export default function FindingReportBlock({ finding, index }: FindingReportBlockProps) {
   return (
     <div className="report" id={`finding-${finding.id}`}>
@@ -129,14 +157,12 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
                   <div className="row" key={fOption}>
                     {severityOptions.map((sOption) => {
                       const cellLevel = getMatrixLevel(fOption, sOption);
-                      const dimmedClass = isDimmed(
+                      const dimmedClass = getDimmedClass(
                         fOption,
                         sOption,
                         finding.feasibility,
                         finding.severity,
-                      )
-                        ? " dimmed"
-                        : "";
+                      );
                       return (
                         <div
                           key={`${fOption}-${sOption}`}
@@ -157,9 +183,10 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
           <div className="paragraph">
             <div className="title">被害度理由</div>
             <div className="content1">
-              <div
+              <MarkdownHtml
+                finding={finding}
                 id="severity-reason"
-                dangerouslySetInnerHTML={renderFindingMarkdown(finding, finding.severityReason)}
+                markdownSource={finding.severityReason}
               />
             </div>
           </div>
@@ -168,9 +195,10 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
           <div className="paragraph">
             <div className="title">実現度理由</div>
             <div className="content1">
-              <div
+              <MarkdownHtml
+                finding={finding}
                 id="feasibility-reason"
-                dangerouslySetInnerHTML={renderFindingMarkdown(finding, finding.feasibilityReason)}
+                markdownSource={finding.feasibilityReason}
               />
             </div>
           </div>
@@ -198,8 +226,11 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
                   </div>
                 </div>
               </div>
-              {finding.locations.map((location, locIndex) => (
-                <div className="row5" key={`${location.method}-${location.url}-${locIndex}`}>
+              {finding.locations.map((location) => (
+                <div
+                  className="row5"
+                  key={`${location.method}-${location.url}-${location.parameter}`}
+                >
                   <div className="cell3">
                     <div className="content3">
                       <div className="text23">{location.method}</div>
@@ -223,10 +254,7 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
         <div className="paragraph avoid-break">
           <div className="title">説明</div>
           <div className="content1">
-            <div
-              id="description"
-              dangerouslySetInnerHTML={renderFindingMarkdown(finding, finding.description)}
-            />
+            <MarkdownHtml finding={finding} id="description" markdownSource={finding.description} />
           </div>
         </div>
         {finding.reproductionSteps.length > 0 && (
@@ -234,12 +262,9 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
             <div className="title">再現方法・詳細</div>
             <div className="content1">
               <ol className="ol">
-                {finding.reproductionSteps.map((step, stepIndex) => (
-                  <li className="li" key={`${finding.id}-step-${stepIndex}`}>
-                    <div
-                      id="reproduction-step"
-                      dangerouslySetInnerHTML={renderFindingMarkdown(finding, step)}
-                    />
+                {finding.reproductionSteps.map((step) => (
+                  <li className="li" key={step}>
+                    <MarkdownHtml finding={finding} id="reproduction-step" markdownSource={step} />
                   </li>
                 ))}
               </ol>
@@ -250,10 +275,7 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
           <div className="paragraph avoid-break">
             <div className="title">対策方法</div>
             <div className="content1">
-              <div
-                id="solutions"
-                dangerouslySetInnerHTML={renderFindingMarkdown(finding, finding.solutions)}
-              />
+              <MarkdownHtml finding={finding} id="solutions" markdownSource={finding.solutions} />
             </div>
           </div>
         )}
@@ -261,9 +283,10 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
           <div className="paragraph avoid-break">
             <div className="title">その他指摘事項</div>
             <div className="content1">
-              <div
+              <MarkdownHtml
+                finding={finding}
                 id="other-remarks"
-                dangerouslySetInnerHTML={renderFindingMarkdown(finding, finding.otherRemarks)}
+                markdownSource={finding.otherRemarks}
               />
             </div>
           </div>
@@ -273,12 +296,9 @@ export default function FindingReportBlock({ finding, index }: FindingReportBloc
             <div className="title">参考文献</div>
             <div className="content1">
               <ol className="ol">
-                {finding.references.map((reference, refIndex) => (
-                  <li className="li" key={`${finding.id}-reference-${refIndex}`}>
-                    <div
-                      id="reference"
-                      dangerouslySetInnerHTML={renderFindingMarkdown(finding, reference)}
-                    />
+                {finding.references.map((reference) => (
+                  <li className="li" key={reference}>
+                    <MarkdownHtml finding={finding} id="reference" markdownSource={reference} />
                   </li>
                 ))}
               </ol>

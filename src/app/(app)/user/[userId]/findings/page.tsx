@@ -101,7 +101,10 @@ export default function UserFindingsPage() {
                 <TableRow key={finding.id}>
                   <TableCell>{finding.domainName || "-"}</TableCell>
                   <TableCell>
-                    <Link className="text-accent-color hover:underline" href={`/findings/${finding.id}`}>
+                    <Link
+                      className="text-accent-color hover:underline"
+                      href={`/findings/${finding.id}`}
+                    >
                       {finding.notFound && "[未検出] "}
                       {finding.title}
                     </Link>
@@ -109,7 +112,9 @@ export default function UserFindingsPage() {
                   <TableCell className="text-center">{finding.riskLevel}</TableCell>
                   <TableCell className="text-center">{finding.severity}</TableCell>
                   <TableCell className="text-center">{finding.feasibility}</TableCell>
-                  <TableCell className="text-center">{finding.reviewerUserName || "未設定"}</TableCell>
+                  <TableCell className="text-center">
+                    {finding.reviewerUserName || "未設定"}
+                  </TableCell>
                   <TableCell className="text-center">{STATUS_LABELS[finding.status]}</TableCell>
                 </TableRow>
               ))}

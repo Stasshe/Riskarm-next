@@ -13,8 +13,8 @@ import {
   TableHeaderCell,
   TableRow,
 } from "@/components/Table";
-import { listUserProfiles, updateUserProfile } from "@/lib/firestore/users";
 import { useAuth } from "@/lib/auth";
+import { listUserProfiles, updateUserProfile } from "@/lib/firestore/users";
 import type { UserProfile } from "@/types";
 
 export default function AdminUsersPage() {

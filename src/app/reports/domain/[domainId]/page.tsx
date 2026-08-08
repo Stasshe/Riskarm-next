@@ -107,8 +107,8 @@ function CoverPage({ domain, detectedFindings, notFoundFindings, settings }: Cov
           <div className="title-hyoshi">検査実施項目</div>
           <div className="content1-hyoshi">
             <ol className="xss-sql-csrf-hyoshi">
-              {domain.surveyItems.map((item, index) => (
-                <li className="xss-hyoshi" key={`${item}-${index}`}>
+              {domain.surveyItems.map((item) => (
+                <li className="xss-hyoshi" key={item}>
                   {item}
                 </li>
               ))}
@@ -394,7 +394,11 @@ export default function DomainReportPage() {
   }
 
   if (!domain || !settings) {
-    return <div className="flex h-screen items-center justify-center">レポートデータが見つかりません。</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        レポートデータが見つかりません。
+      </div>
+    );
   }
 
   return (
@@ -408,6 +412,7 @@ export default function DomainReportPage() {
         <thead>
           <tr>
             <td>
+              {/* biome-ignore lint/performance/noImgElement: print CSS targets the original report header image markup. */}
               <img className="header-icon" alt="" src="/images/header.svg" />
             </td>
           </tr>
