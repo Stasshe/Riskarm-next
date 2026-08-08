@@ -1,0 +1,37 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "findings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "domainId", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "findings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "assignedUserId", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "findings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "reviewerUserId", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "findings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "deleted", "order": "ASCENDING" },
+        { "fieldPath": "domainId", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

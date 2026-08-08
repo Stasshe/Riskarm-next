@@ -2,5 +2,6 @@ allowBuilds:
   '@biomejs/biome': false
   '@firebase/util': set this to true or false
   '@tailwindcss/oxide': false
+  esbuild: set this to true or false
   protobufjs: set this to true or false
   sharp: false
