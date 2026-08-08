@@ -104,9 +104,8 @@ risk_matrix[feasibility_index][severity_index] = [
 
 3. firestore.rules 設計
 
-function allowedEmails() { return ['egnm9stasshe@gmail.com' /* TODO: 追加分
-function adminEmails()   { return ['egnm9stasshe@gmail.com' /* TODO: 追加分ここに列挙 */]; }
-実装時にユーザーから正式リストを受け取り確定させる(未確定のまま実装完了させない)。
+function allowedEmails() { return ['egnm9stasshe@gmail.com','puna17942@gmail.com','keemacurry238@gmail.com']; }
+function adminEmails()   { return ['egnm9stasshe@gmail.com','keemacurry238@gmail.com']; }
 
 - findingTemplates: read/create/update=allowlist済み全員。delete=adminのみ。
 - findings: read=allowlist済み全員。create=assignedUserId==自分必須(元実装通り作成者が担当者)、status=='NOT_STARTED'、riskLevel整合性チェック。update=以下いずれか成立で許可:
@@ -114,9 +113,8 @@ function adminEmails()   { return ['egnm9stasshe@gmail.com' /* TODO: 追加分�
 
 3. firestore.rules 設計
 
-function allowedEmails() { return ['egnm9stasshe@gmail.com' /* TODO: 追加分
-function adminEmails()   { return ['egnm9stasshe@gmail.com' /* TODO: 追加分ここに列挙 */]; }
-実装時にユーザーから正式リストを受け取り確定させる(未確定のまま実装完了させない)。
+function allowedEmails() { return ['egnm9stasshe@gmail.com','puna17942@gmail.com','keemacurry238@gmail.com']; }
+function adminEmails()   { return ['egnm9stasshe@gmail.com','keemacurry238@gmail.com']; }
 
 - isAllowlisted(): request.auth != null && request.auth.token.email in allowedEmails()
 - isAdminUser(): allowlist済み + users/{uid}.isAdmin == true
@@ -134,9 +132,9 @@ function adminEmails()   { return ['egnm9stasshe@gmail.com' /* TODO: 追加分�
     - REVIEWED→COMPLETED: 担当者かレビュアー
     - COMPLETED→WIP / WIP→NOT_STARTED: 担当者のみ
     - 変更キーはstatus,updatedAtのみ
-  - レビュアー設定: 担当者本人がreviewerUserId設定可(自分をレビュアーに設定 )
+  - レビュアー設定: 担当者本人がreviewerUserId/reviewerUserName設定可(自分をレビュアーに設定不可)
   - assignedUserId変更(担当者再割当)は元実装通りadmin専用、非adminからは不可
-  - ドキュメントサイズ上限チェック(request.resource.size() < 900000)を画像バジェットの防衛策としてcreate/update両方に追加
+  - imagesは配列かつ最大6件。総byte上限はクライアント側保存前チェックで拒否する。
 - 削除/復元/一括登録/設定変更はすべてisAdminUser()経由
 - Rules単体テスト必須: Firebase Emulator + @firebase/rules-unit-testingで全ル拒否)をカバー
 
@@ -219,7 +217,7 @@ firebase.json     (emulator設定、rulesテスト用)
 実装後に必要な作業(このplan.mdとは別)
 
 - SPECIFICATION.mdをプロジェクトルートに新規作成(グローバル指示: 設計変更時必須)。抽象度分離、意図(INTENT)は本plan.mdの「確定した設計判断」セクションを土台に整理。
-- 許可メールアドレス(allowedEmails/adminEmails)の正式リストをユーザーから受領後、firestore.rulesに確定反映(現状TODOプレースホルダーのまま実装完了させない)。
+- 許可メールアドレス(allowedEmails/adminEmails)はfirestore.rulesに確定反映済み。変更時はAuthProviderのadmin初期値リストも同時更新する。
 - Firebase側の実プロジェクト作成・Vercel環境変数設定(NEXT_PUBLIC_FIREBASE_*ザー側作業(認証情報を要するため)。
 
 検証方法

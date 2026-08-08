@@ -13,6 +13,8 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
 import type { UserProfile } from "@/types";
 
+const ADMIN_EMAILS = new Set(["egnm9stasshe@gmail.com", "keemacurry238@gmail.com"]);
+
 interface AuthContextValue {
   user: FirebaseUser | null;
   profile: UserProfile | null;
@@ -51,10 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (snap.exists()) {
           setProfile(snap.data() as UserProfile);
         } else {
+          const email = firebaseUser.email ?? "";
           const newProfile = {
-            email: firebaseUser.email ?? "",
-            displayName: firebaseUser.displayName ?? firebaseUser.email ?? "",
-            isAdmin: false,
+            email,
+            displayName: firebaseUser.displayName ?? email,
+            isAdmin: ADMIN_EMAILS.has(email),
             createdAt: serverTimestamp(),
           };
           await setDoc(userRef, newProfile);

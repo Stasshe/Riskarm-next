@@ -19,11 +19,9 @@ import { afterAll, beforeAll, beforeEach, describe, it } from "vitest";
 import { computeRiskLevel } from "@/lib/riskMatrix";
 import type { Finding, FindingTemplate } from "@/types";
 
-// The only allowlisted (and only admin) email in the current placeholder
-// firestore.rules. Multiple distinct uids share this email to simulate
-// several allowlisted users, since the rules distinguish roles by uid, not
-// by email (email only gates the allowlist itself).
-const ALLOWED_EMAIL = "egnm9stasshe@gmail.com";
+const ADMIN_EMAIL = "egnm9stasshe@gmail.com";
+const USER_EMAIL = "puna17942@gmail.com";
+const SECOND_ADMIN_EMAIL = "keemacurry238@gmail.com";
 const OUTSIDER_EMAIL = "not-allowed@example.com";
 
 const ADMIN_UID = "admin-uid";
@@ -56,25 +54,25 @@ beforeEach(async () => {
   await testEnv.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore();
     await setDoc(doc(db, "users", ADMIN_UID), {
-      email: ALLOWED_EMAIL,
+      email: ADMIN_EMAIL,
       displayName: "Admin",
       isAdmin: true,
       createdAt: Timestamp.now(),
     });
     await setDoc(doc(db, "users", ASSIGNEE_UID), {
-      email: ALLOWED_EMAIL,
+      email: USER_EMAIL,
       displayName: "Assignee",
       isAdmin: false,
       createdAt: Timestamp.now(),
     });
     await setDoc(doc(db, "users", REVIEWER_UID), {
-      email: ALLOWED_EMAIL,
+      email: USER_EMAIL,
       displayName: "Reviewer",
       isAdmin: false,
       createdAt: Timestamp.now(),
     });
     await setDoc(doc(db, "users", OTHER_UID), {
-      email: ALLOWED_EMAIL,
+      email: USER_EMAIL,
       displayName: "Other",
       isAdmin: false,
       createdAt: Timestamp.now(),
@@ -82,8 +80,12 @@ beforeEach(async () => {
   });
 });
 
-function ctx(uid: string, email = ALLOWED_EMAIL) {
+function ctx(uid: string, email = USER_EMAIL) {
   return testEnv.authenticatedContext(uid, { email }).firestore();
+}
+
+function adminCtx() {
+  return ctx(ADMIN_UID, ADMIN_EMAIL);
 }
 
 function unauthed() {
@@ -149,24 +151,46 @@ describe("allowlist enforcement", () => {
 
 describe("users/{uid} self-provisioning", () => {
   it("allows a user to self-provision with isAdmin matching the hardcoded admin list", async () => {
-    const db = ctx("new-admin-uid");
+    const db = ctx("new-admin-uid", SECOND_ADMIN_EMAIL);
     await assertSucceeds(
       setDoc(doc(db, "users", "new-admin-uid"), {
-        email: ALLOWED_EMAIL,
+        email: SECOND_ADMIN_EMAIL,
         displayName: "New Admin",
-        isAdmin: true, // ALLOWED_EMAIL is in adminEmails()
+        isAdmin: true,
+        createdAt: serverTimestamp(),
+      }),
+    );
+  });
+
+  it("allows a non-admin allowlisted user to self-provision with isAdmin false", async () => {
+    const db = ctx("new-user-uid");
+    await assertSucceeds(
+      setDoc(doc(db, "users", "new-user-uid"), {
+        email: USER_EMAIL,
+        displayName: "New User",
+        isAdmin: false,
         createdAt: serverTimestamp(),
       }),
     );
   });
 
   it("rejects self-provisioning with isAdmin not matching the hardcoded admin list", async () => {
-    const db = ctx("new-user-uid");
+    const adminDb = ctx("bad-admin-uid", ADMIN_EMAIL);
     await assertFails(
-      setDoc(doc(db, "users", "new-user-uid"), {
-        email: ALLOWED_EMAIL,
-        displayName: "New User",
-        isAdmin: false, // self-demotion attempt: ALLOWED_EMAIL IS an admin email
+      setDoc(doc(adminDb, "users", "bad-admin-uid"), {
+        email: ADMIN_EMAIL,
+        displayName: "Bad Admin",
+        isAdmin: false,
+        createdAt: serverTimestamp(),
+      }),
+    );
+
+    const userDb = ctx("promoted-user-uid", USER_EMAIL);
+    await assertFails(
+      setDoc(doc(userDb, "users", "promoted-user-uid"), {
+        email: USER_EMAIL,
+        displayName: "Promoted User",
+        isAdmin: true,
         createdAt: serverTimestamp(),
       }),
     );
@@ -176,9 +200,9 @@ describe("users/{uid} self-provisioning", () => {
     const db = ctx("impersonator-uid");
     await assertFails(
       setDoc(doc(db, "users", "someone-else-uid"), {
-        email: ALLOWED_EMAIL,
+        email: USER_EMAIL,
         displayName: "Impersonated",
-        isAdmin: true,
+        isAdmin: false,
         createdAt: serverTimestamp(),
       }),
     );
@@ -209,12 +233,12 @@ describe("users/{uid} updates", () => {
   });
 
   it("allows admin to update any field on any profile", async () => {
-    await assertSucceeds(updateDoc(doc(ctx(ADMIN_UID), "users", ASSIGNEE_UID), { isAdmin: true }));
+    await assertSucceeds(updateDoc(doc(adminCtx(), "users", ASSIGNEE_UID), { isAdmin: true }));
   });
 
   it("rejects a non-admin deleting a user profile; allows admin", async () => {
     await assertFails(deleteDoc(doc(ctx(ASSIGNEE_UID), "users", OTHER_UID)));
-    await assertSucceeds(deleteDoc(doc(ctx(ADMIN_UID), "users", OTHER_UID)));
+    await assertSucceeds(deleteDoc(doc(adminCtx(), "users", OTHER_UID)));
   });
 });
 
@@ -235,9 +259,7 @@ describe("settings/app", () => {
 
   it("rejects a non-admin writing settings; allows admin", async () => {
     await assertFails(updateDoc(doc(ctx(OTHER_UID), "settings", "app"), { reportTitle: "Hacked" }));
-    await assertSucceeds(
-      updateDoc(doc(ctx(ADMIN_UID), "settings", "app"), { reportTitle: "Updated" }),
-    );
+    await assertSucceeds(updateDoc(doc(adminCtx(), "settings", "app"), { reportTitle: "Updated" }));
   });
 });
 
@@ -284,13 +306,13 @@ describe("domains", () => {
       });
     });
     await assertSucceeds(
-      updateDoc(doc(ctx(ADMIN_UID), "domains", "d1"), {
+      updateDoc(doc(adminCtx(), "domains", "d1"), {
         deleted: true,
         deletedAt: Timestamp.now(),
       }),
     );
     await assertSucceeds(
-      updateDoc(doc(ctx(ADMIN_UID), "domains", "d1"), { deleted: false, deletedAt: null }),
+      updateDoc(doc(adminCtx(), "domains", "d1"), { deleted: false, deletedAt: null }),
     );
   });
 
@@ -298,7 +320,7 @@ describe("domains", () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await setDoc(doc(context.firestore(), "domains", "d1"), { name: "example.com" });
     });
-    await assertFails(deleteDoc(doc(ctx(ADMIN_UID), "domains", "d1")));
+    await assertFails(deleteDoc(doc(adminCtx(), "domains", "d1")));
   });
 });
 
@@ -335,7 +357,7 @@ describe("findingTemplates", () => {
       await setDoc(doc(context.firestore(), "findingTemplates", "t1"), templateSeed);
     });
     await assertFails(deleteDoc(doc(ctx(OTHER_UID), "findingTemplates", "t1")));
-    await assertSucceeds(deleteDoc(doc(ctx(ADMIN_UID), "findingTemplates", "t1")));
+    await assertSucceeds(deleteDoc(doc(adminCtx(), "findingTemplates", "t1")));
   });
 });
 
@@ -507,7 +529,7 @@ describe("findings status transitions", () => {
 
   it("admin can perform any transition regardless of role", async () => {
     await assertSucceeds(
-      updateDoc(doc(ctx(ADMIN_UID), "findings", "f1"), {
+      updateDoc(doc(adminCtx(), "findings", "f1"), {
         status: "WIP",
         updatedAt: serverTimestamp(),
       }),
@@ -560,6 +582,9 @@ describe("findings content edit", () => {
     await assertFails(
       updateDoc(doc(ctx(ASSIGNEE_UID), "findings", "f1"), { assignedUserId: OTHER_UID }),
     );
+    await assertFails(
+      updateDoc(doc(ctx(ASSIGNEE_UID), "findings", "f1"), { reviewerUserName: "Tampered" }),
+    );
   });
 });
 
@@ -572,6 +597,7 @@ describe("findings reviewer assignment", () => {
     await assertSucceeds(
       updateDoc(doc(ctx(ASSIGNEE_UID), "findings", "f1"), {
         reviewerUserId: REVIEWER_UID,
+        reviewerUserName: "Reviewer",
         updatedAt: serverTimestamp(),
       }),
     );
@@ -581,6 +607,7 @@ describe("findings reviewer assignment", () => {
     await assertFails(
       updateDoc(doc(ctx(ASSIGNEE_UID), "findings", "f1"), {
         reviewerUserId: ASSIGNEE_UID,
+        reviewerUserName: "Assignee",
         updatedAt: serverTimestamp(),
       }),
     );
@@ -590,6 +617,7 @@ describe("findings reviewer assignment", () => {
     await assertFails(
       updateDoc(doc(ctx(OTHER_UID), "findings", "f1"), {
         reviewerUserId: OTHER_UID,
+        reviewerUserName: "Other",
         updatedAt: serverTimestamp(),
       }),
     );
@@ -609,7 +637,7 @@ describe("findings assignment (reassignment) is admin-only", () => {
 
   it("allows an admin to reassign the finding", async () => {
     await assertSucceeds(
-      updateDoc(doc(ctx(ADMIN_UID), "findings", "f1"), { assignedUserId: OTHER_UID }),
+      updateDoc(doc(adminCtx(), "findings", "f1"), { assignedUserId: OTHER_UID }),
     );
   });
 });
@@ -620,7 +648,7 @@ describe("findings delete", () => {
   });
 
   it("never allows hard delete, even for admin", async () => {
-    await assertFails(deleteDoc(doc(ctx(ADMIN_UID), "findings", "f1")));
+    await assertFails(deleteDoc(doc(adminCtx(), "findings", "f1")));
   });
 
   it("allows admin to soft-delete via update; rejects non-admin", async () => {
@@ -631,7 +659,7 @@ describe("findings delete", () => {
       }),
     );
     await assertSucceeds(
-      updateDoc(doc(ctx(ADMIN_UID), "findings", "f1"), {
+      updateDoc(doc(adminCtx(), "findings", "f1"), {
         deleted: true,
         deletedAt: Timestamp.now(),
       }),
@@ -639,12 +667,18 @@ describe("findings delete", () => {
   });
 });
 
-describe("findings document size guard", () => {
-  it("rejects an update that pushes the document over the size budget", async () => {
+describe("findings image guard", () => {
+  it("rejects an update with more than six images", async () => {
     await seedFinding("f1", {});
-    const oversized = "x".repeat(950_000);
     await assertFails(
-      updateDoc(doc(ctx(ASSIGNEE_UID), "findings", "f1"), { otherRemarks: oversized }),
+      updateDoc(doc(ctx(ASSIGNEE_UID), "findings", "f1"), {
+        images: Array.from({ length: 7 }, (_, index) => ({
+          id: `image-${index}`,
+          dataUrl: "data:image/png;base64,x",
+          filename: `image-${index}.png`,
+          sizeBytes: 1,
+        })),
+      }),
     );
   });
 });
