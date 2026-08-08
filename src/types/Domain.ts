@@ -1,4 +1,4 @@
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from "firebase/firestore";
 
 export interface Domain {
   id: string;
@@ -15,4 +15,7 @@ export interface Domain {
   findingsCount: number;
 }
 
-export type DomainInput = Omit<Domain, 'id' | 'createdAt' | 'updatedAt' | 'deleted' | 'deletedAt' | 'findingsCount'>;
+export type DomainInput = Omit<
+  Domain,
+  "id" | "createdAt" | "updatedAt" | "deleted" | "deletedAt" | "findingsCount"
+>;

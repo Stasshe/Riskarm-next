@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { SelectHTMLAttributes } from 'react';
+import type { SelectHTMLAttributes } from "react";
 
 interface SelectOption {
   value: string | number;
@@ -19,15 +19,15 @@ const Select = ({
   label,
   options,
   error,
-  className = '',
-  selectClassName = '',
+  className = "",
+  selectClassName = "",
   id,
   ...props
 }: SelectProps) => {
   const selectBaseStyles = `w-full px-3 py-2.5 bg-dark-card bg-opacity-80 backdrop-filter backdrop-blur-sm border border-dark-border rounded-md shadow-sm text-light-text placeholder-medium-text focus:outline-none focus:ring-2 focus:ring-accent-gray focus:ring-opacity-70 focus:border-accent-gray focus:border-opacity-70 transition-all duration-200 appearance-none
-    ${error ? 'border-danger-DEFAULT' : ''} ${selectClassName}`;
+    ${error ? "border-danger-DEFAULT" : ""} ${selectClassName}`;
 
-  const selectId = id || (label ? label.toLowerCase().replace(/\s/g, '-') : undefined);
+  const selectId = id || (label ? label.toLowerCase().replace(/\s/g, "-") : undefined);
 
   return (
     <div className={`mb-4 ${className}`}>
@@ -49,6 +49,7 @@ const Select = ({
             className="fill-current h-4 w-4"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
+            aria-hidden="true"
           >
             <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
           </svg>

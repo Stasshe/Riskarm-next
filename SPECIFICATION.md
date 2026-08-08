@@ -189,7 +189,7 @@ body: { message: string }
 書き直し(構造は参考、Firestore/Next.js流儀で再実装): Sidebar.tsx(nav/collapse状態は維持、next/link+新AuthContext使用)、DomainForm/FindingForm(591行)/TemplateForm(468行)(フィールドレイアウト・配列編集UXは維持、送信処理をfetchからaddDoc/updateDoc直呼びに変更、画像アップロードウィジェット・リスクレベルライブプレ →src/lib/auth.tsx(AuthProviderがFirebaseonAuthStateChanged+users/{uid}自己プロビジョニング)、hooks/useApiData.ts→FirestoreネイティブonSnapshotフック。
 
 追加依存: firebase(クライアントSDK)、marked、highlight.js、@types/marked。react-iconsは既存のFa系アイコンと1:1対応のため維持。                                                         
-Firebase初期化 src/lib/firebase.ts: NEXT_PUBLIC_FIREBASE_*環境変数群(apiKey/authDomain/projectId/storageBucket/messagingSenderId/appId)、initializeFirestoreにpersistentLocalCache({tabManager: persistentMultipleTabManager()})設定してオフラインキャッシュ有効化。
+Firebase初期化 src/lib/firebase.ts: NEXT_PUBLIC_FIREBASE_*環境変数群(apiKey/authDomain/projectId/storageBucket/messagingSenderId/appId)。getFirebaseAuth/getFirebaseDb呼び出し時だけブラウザで初期化する。Next.jsのprerender/buildではFirebase Authを起動しない。FirestoreはinitializeFirestoreにpersistentLocalCache({tabManager: persistentMultipleTabManager()})設定してオフラインキャッシュ有効化。
 
 next.config.ts変更: output:'export'静的書き出し分岐・BUILD_MODE/basePathプラミング全削除(Vercel動的デプロイ前提のデフォルト出力に戻す)。
 

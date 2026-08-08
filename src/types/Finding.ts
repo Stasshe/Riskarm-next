@@ -1,9 +1,9 @@
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from "firebase/firestore";
 
-export const SEVERITY_LEVELS = ['重大', '高', '中', '低', 'その他'] as const;
-export const FEASIBILITY_LEVELS = ['高', '中', '低', '不可'] as const;
-export const RISK_LEVELS = ['緊急', '高', '中', '低', 'その他'] as const;
-export const FINDING_STATUSES = ['NOT_STARTED', 'WIP', 'COMPLETED', 'REVIEWED'] as const;
+export const SEVERITY_LEVELS = ["重大", "高", "中", "低", "その他"] as const;
+export const FEASIBILITY_LEVELS = ["高", "中", "低", "不可"] as const;
+export const RISK_LEVELS = ["緊急", "高", "中", "低", "その他"] as const;
+export const FINDING_STATUSES = ["NOT_STARTED", "WIP", "COMPLETED", "REVIEWED"] as const;
 
 export type Severity = (typeof SEVERITY_LEVELS)[number];
 export type Feasibility = (typeof FEASIBILITY_LEVELS)[number];
@@ -55,17 +55,17 @@ export interface Finding {
 
 export type FindingContentInput = Pick<
   Finding,
-  | 'title'
-  | 'notFound'
-  | 'severity'
-  | 'feasibility'
-  | 'severityReason'
-  | 'feasibilityReason'
-  | 'locations'
-  | 'description'
-  | 'reproductionSteps'
-  | 'solutions'
-  | 'otherRemarks'
-  | 'references'
-  | 'images'
+  | "title"
+  | "notFound"
+  | "severity"
+  | "feasibility"
+  | "severityReason"
+  | "feasibilityReason"
+  | "locations"
+  | "description"
+  | "reproductionSteps"
+  | "solutions"
+  | "otherRemarks"
+  | "references"
+  | "images"
 >;

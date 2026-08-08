@@ -1,4 +1,10 @@
-import { FEASIBILITY_LEVELS, type Feasibility, type RiskLevel, SEVERITY_LEVELS, type Severity } from '@/types';
+import {
+  FEASIBILITY_LEVELS,
+  type Feasibility,
+  type RiskLevel,
+  SEVERITY_LEVELS,
+  type Severity,
+} from "@/types";
 
 /**
  * Exact port of the risk matrix from original/app/models/finding.py.
@@ -8,10 +14,10 @@ import { FEASIBILITY_LEVELS, type Feasibility, type RiskLevel, SEVERITY_LEVELS, 
  *   feasibility_levels = ["高","中","低","不可"]
  */
 const RISK_MATRIX: readonly (readonly RiskLevel[])[] = [
-  ['緊急', '緊急', '高', '中', 'その他'],
-  ['緊急', '高', '中', '低', 'その他'],
-  ['高', '中', '低', '低', 'その他'],
-  ['中', '低', '低', '低', 'その他'],
+  ["緊急", "緊急", "高", "中", "その他"],
+  ["緊急", "高", "中", "低", "その他"],
+  ["高", "中", "低", "低", "その他"],
+  ["中", "低", "低", "低", "その他"],
 ];
 
 /**

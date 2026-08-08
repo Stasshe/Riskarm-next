@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { TextareaHTMLAttributes } from 'react';
+import type { TextareaHTMLAttributes } from "react";
 
 interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -12,16 +12,16 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 const TextArea = ({
   label,
   error,
-  className = '',
-  textareaClassName = '',
+  className = "",
+  textareaClassName = "",
   id,
   ...props
 }: TextAreaProps) => {
   const textareaBaseStyles = `w-full px-3 py-2.5 bg-dark-card bg-opacity-80 backdrop-filter backdrop-blur-sm border border-dark-border rounded-md shadow-sm text-light-text placeholder-medium-text focus:outline-none focus:ring-2 focus:ring-accent-gray focus:ring-opacity-70 focus:border-accent-gray focus:border-opacity-70 transition-all duration-200
     disabled:bg-dark-card disabled:bg-opacity-50 disabled:border-dark-border disabled:border-opacity-50 disabled:text-dark-text disabled:placeholder-dark-text disabled:cursor-not-allowed disabled:shadow-none
-    ${error ? 'border-danger-DEFAULT' : ''} ${textareaClassName}`;
+    ${error ? "border-danger-DEFAULT" : ""} ${textareaClassName}`;
 
-  const textareaId = id || (label ? label.toLowerCase().replace(/\s/g, '-') : undefined);
+  const textareaId = id || (label ? label.toLowerCase().replace(/\s/g, "-") : undefined);
 
   return (
     <div className={`mb-4 ${className}`}>

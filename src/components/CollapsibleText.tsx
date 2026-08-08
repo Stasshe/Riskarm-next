@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface CollapsibleTextProps {
   text: string;
@@ -23,10 +23,11 @@ const CollapsibleText = ({ text, maxLength, className }: CollapsibleTextProps) =
       <p className={`mb-2 whitespace-pre-wrap ${className}`}>{displayedText}</p>
       {shouldCollapse && (
         <button
+          type="button"
           onClick={toggleExpanded}
           className="text-link-DEFAULT hover:text-link-hover hover:underline focus:outline-none"
         >
-          {isExpanded ? '折りたたむ' : 'もっと見る'}
+          {isExpanded ? "折りたたむ" : "もっと見る"}
         </button>
       )}
     </div>

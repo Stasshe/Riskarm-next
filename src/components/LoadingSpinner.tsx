@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
 interface LoadingSpinnerProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
 }
 
-const LoadingSpinner = ({ size = 'medium' }: LoadingSpinnerProps) => {
+const LoadingSpinner = ({ size = "medium" }: LoadingSpinnerProps) => {
   const sizeClasses = {
-    small: 'h-4 w-4 border-2',
-    medium: 'h-8 w-8 border-4',
-    large: 'h-16 w-16 border-4',
+    small: "h-4 w-4 border-2",
+    medium: "h-8 w-8 border-4",
+    large: "h-16 w-16 border-4",
   };
 
   return (

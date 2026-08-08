@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
+import type { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from "react";
 
 interface TableProps extends HTMLAttributes<HTMLTableElement> {
   className?: string;
@@ -26,7 +26,7 @@ interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
   className?: string;
 }
 
-const Table = ({ className = '', children, ...props }: TableProps) => {
+const Table = ({ className = "", children, ...props }: TableProps) => {
   const combinedStyles = `min-w-full divide-y divide-dark-border ${className}`;
   return (
     <div className="overflow-x-auto rounded-md border border-dark-border shadow-md">
@@ -37,7 +37,7 @@ const Table = ({ className = '', children, ...props }: TableProps) => {
   );
 };
 
-const TableHeader = ({ className = '', children, ...props }: TableHeaderProps) => {
+const TableHeader = ({ className = "", children, ...props }: TableHeaderProps) => {
   const combinedStyles = `bg-dark-card ${className}`;
   return (
     <thead className={combinedStyles} {...props}>
@@ -46,7 +46,7 @@ const TableHeader = ({ className = '', children, ...props }: TableHeaderProps) =
   );
 };
 
-const TableBody = ({ className = '', children, ...props }: TableBodyProps) => {
+const TableBody = ({ className = "", children, ...props }: TableBodyProps) => {
   const combinedStyles = `bg-dark-bg divide-y divide-dark-border ${className}`;
   return (
     <tbody className={combinedStyles} {...props}>
@@ -55,7 +55,7 @@ const TableBody = ({ className = '', children, ...props }: TableBodyProps) => {
   );
 };
 
-const TableRow = ({ className = '', children, ...props }: TableRowProps) => {
+const TableRow = ({ className = "", children, ...props }: TableRowProps) => {
   const combinedStyles = `hover:bg-dark-border ${className}`;
   return (
     <tr className={combinedStyles} {...props}>
@@ -64,7 +64,7 @@ const TableRow = ({ className = '', children, ...props }: TableRowProps) => {
   );
 };
 
-const TableHeaderCell = ({ className = '', children, ...props }: TableHeaderCellProps) => {
+const TableHeaderCell = ({ className = "", children, ...props }: TableHeaderCellProps) => {
   const combinedStyles = `px-6 py-3 text-left text-xs font-medium text-medium-text uppercase tracking-wider ${className}`;
   return (
     <th scope="col" className={combinedStyles} {...props}>
@@ -73,7 +73,7 @@ const TableHeaderCell = ({ className = '', children, ...props }: TableHeaderCell
   );
 };
 
-const TableCell = ({ className = '', children, ...props }: TableCellProps) => {
+const TableCell = ({ className = "", children, ...props }: TableCellProps) => {
   const combinedStyles = `px-6 py-4 text-sm text-light-text ${className}`;
   return (
     <td className={combinedStyles} {...props}>
@@ -82,4 +82,4 @@ const TableCell = ({ className = '', children, ...props }: TableCellProps) => {
   );
 };
 
-export { Table, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell };
+export { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow };

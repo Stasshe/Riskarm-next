@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, type User as FirebaseUser } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  type User as FirebaseUser,
+  signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+} from "firebase/auth";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
-import { auth, db } from '@/lib/firebase';
-import type { UserProfile } from '@/types';
+import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
+import type { UserProfile } from "@/types";
 
 interface AuthContextValue {
   user: FirebaseUser | null;
@@ -26,6 +32,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
+    const auth = getFirebaseAuth();
+    const db = getFirebaseDb();
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setAccessDenied(false);
       if (!firebaseUser) {
@@ -37,14 +46,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(firebaseUser);
 
       try {
-        const userRef = doc(db, 'users', firebaseUser.uid);
+        const userRef = doc(db, "users", firebaseUser.uid);
         const snap = await getDoc(userRef);
         if (snap.exists()) {
           setProfile(snap.data() as UserProfile);
         } else {
           const newProfile = {
-            email: firebaseUser.email ?? '',
-            displayName: firebaseUser.displayName ?? firebaseUser.email ?? '',
+            email: firebaseUser.email ?? "",
+            displayName: firebaseUser.displayName ?? firebaseUser.email ?? "",
             isAdmin: false,
             createdAt: serverTimestamp(),
           };
@@ -53,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setProfile(created.data() as UserProfile);
         }
       } catch (err) {
-        console.error('user profile provisioning failed', err);
+        console.error("user profile provisioning failed", err);
         setAccessDenied(true);
         setProfile(null);
         await firebaseSignOut(auth);
@@ -67,10 +76,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(async () => {
     setAccessDenied(false);
+    const auth = getFirebaseAuth();
     await signInWithPopup(auth, new GoogleAuthProvider());
   }, []);
 
   const signOutUser = useCallback(async () => {
+    const auth = getFirebaseAuth();
     await firebaseSignOut(auth);
     setProfile(null);
   }, []);
@@ -91,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return ctx;
 }

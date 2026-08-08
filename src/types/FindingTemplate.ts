@@ -1,5 +1,5 @@
-import type { Timestamp } from 'firebase/firestore';
-import type { Feasibility, FindingImage, FindingLocation, RiskLevel, Severity } from './Finding';
+import type { Timestamp } from "firebase/firestore";
+import type { Feasibility, FindingImage, FindingLocation, RiskLevel, Severity } from "./Finding";
 
 export interface FindingTemplate {
   id: string;
@@ -21,4 +21,7 @@ export interface FindingTemplate {
   updatedAt: Timestamp | null;
 }
 
-export type FindingTemplateInput = Omit<FindingTemplate, 'id' | 'createdAt' | 'updatedAt' | 'riskLevel'>;
+export type FindingTemplateInput = Omit<
+  FindingTemplate,
+  "id" | "createdAt" | "updatedAt" | "riskLevel"
+>;
