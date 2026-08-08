@@ -15,4 +15,11 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# Discord通知API Route(/api/discord-notify)用、サーバー側のみ
+DISCORD_WEBHOOK_URL=
+APP_SHARED_SECRET=
+NEXT_PUBLIC_APP_SHARED_SECRET=
 ```
+
+デプロイ: Vercel(動的、`output:'export'`不使用)。`firestore.rules`の許可メールアドレスは`allowedEmails()`/`adminEmails()`にハードコード、追加時は`src/lib/auth.tsx`の`ADMIN_EMAILS`も同時更新してデプロイすること。詳細設計は [SPECIFICATION.md](./SPECIFICATION.md)。
