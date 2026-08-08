@@ -6,6 +6,7 @@ import ArrayFieldEditor from "@/components/ArrayFieldEditor";
 import Button from "@/components/Button";
 import ImageUploadWidget from "@/components/ImageUploadWidget";
 import Input from "@/components/Input";
+import MarkdownEditor from "@/components/MarkdownEditor";
 import Select from "@/components/Select";
 import TextArea from "@/components/TextArea";
 import { computeRiskLevel } from "@/lib/riskMatrix";
@@ -414,11 +415,12 @@ export default function FindingForm({
         )}
       />
 
-      <TextArea
+      <MarkdownEditor
         label="説明"
-        rows={6}
+        rows={18}
         value={formData.description}
-        onChange={(event) => updateField("description", event.target.value)}
+        onChange={(value) => updateField("description", value)}
+        images={formData.images}
         disabled={submitting}
       />
 
@@ -450,19 +452,21 @@ export default function FindingForm({
         )}
       />
 
-      <TextArea
+      <MarkdownEditor
         label="対策方法"
-        rows={4}
+        rows={10}
         value={formData.solutions}
-        onChange={(event) => updateField("solutions", event.target.value)}
+        onChange={(value) => updateField("solutions", value)}
+        images={formData.images}
         disabled={submitting}
       />
 
-      <TextArea
+      <MarkdownEditor
         label="その他指摘事項"
-        rows={3}
+        rows={8}
         value={formData.otherRemarks}
-        onChange={(event) => updateField("otherRemarks", event.target.value)}
+        onChange={(value) => updateField("otherRemarks", value)}
+        images={formData.images}
         disabled={submitting}
       />
 

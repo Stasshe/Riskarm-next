@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import Button from "@/components/Button";
 import Input from "@/components/Input";
+import MarkdownEditor from "@/components/MarkdownEditor";
 import Select from "@/components/Select";
 import TextArea from "@/components/TextArea";
 import { computeRiskLevel } from "@/lib/riskMatrix";
@@ -416,13 +417,12 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
         </Button>
       </div>
 
-      <TextArea
+      <MarkdownEditor
         label="説明"
-        id="description"
-        name="description"
-        rows={6}
+        rows={18}
         value={formData.description}
-        onChange={(event) => updateTextField("description", event.target.value)}
+        onChange={(value) => updateTextField("description", value)}
+        images={formData.images}
         disabled={submitting}
       />
 
@@ -496,23 +496,21 @@ export default function TemplateForm({ initialValue, onSubmit, submitLabel }: Te
         </Button>
       </div>
 
-      <TextArea
+      <MarkdownEditor
         label="対策方法"
-        id="solutions"
-        name="solutions"
-        rows={6}
+        rows={10}
         value={formData.solutions}
-        onChange={(event) => updateTextField("solutions", event.target.value)}
+        onChange={(value) => updateTextField("solutions", value)}
+        images={formData.images}
         disabled={submitting}
       />
 
-      <TextArea
+      <MarkdownEditor
         label="その他指摘事項"
-        id="otherRemarks"
-        name="otherRemarks"
-        rows={4}
+        rows={8}
         value={formData.otherRemarks}
-        onChange={(event) => updateTextField("otherRemarks", event.target.value)}
+        onChange={(value) => updateTextField("otherRemarks", value)}
+        images={formData.images}
         disabled={submitting}
       />
 
