@@ -1,5 +1,6 @@
 <svg width="1131" height="92" viewBox="0 0 1131 92" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M0 -3H1131V92H0V-3Z" fill="url(#paint0_linear_10_60)"/>
+<text x="40" y="60" fill="#FFFFFF" font-family="Helvetica, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="2">RiST</text>
 <defs>
 <linearGradient id="paint0_linear_10_60" x1="0" y1="44.5" x2="1131" y2="44.5" gradientUnits="userSpaceOnUse">
 <stop stop-color="#0D0F1C"/>
